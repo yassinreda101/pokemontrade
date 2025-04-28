@@ -31,20 +31,42 @@ Welcome to the **Pokémon Trading App**, the ultimate platform for Pokémon enth
 ---
 
 ## 📚 User Stories
-- As a trainer, sign up and receive a random starter set of Pokémon.
-- Search for Pokémon easily.
-- List your Pokémon for trade or marketplace sale.
-- Propose and accept trades with others.
-- Get trade recommendations powered by AI.
-- Create custom Pokémon designs.
-- Battle with other trainers through AI-simulated matches.
-- Track your badges and achievements.
-- Chat with fellow trainers.
 
-Admin functionality includes:
-- Managing trades and preventing fraud.
-- Managing user accounts and API integrations.
-- Monitoring AI battles.
+1. **As a trainer, I want to sign up and login so I can manage my Pokémon collection securely.**
+
+2. **As a trainer, I want to receive a set of random Pokémon upon registration, so I can start my collection.**
+
+3. **As a trainer, I want to search for Pokémon by name, type, rarity so I can easily find the Pokémon I want.**
+
+4. **As a trainer, I want to propose and accept trades with other players, so I can exchange Pokémon.**
+
+5. **As a trainer, I want to list my Pokémon in the marketplace, so I can sell them to other users.**
+
+6. **As a trainer, I want to purchase Pokémon from the marketplace so I can expand my collection.**
+
+7. **As a trainer, I want AI trade recommendations, so I can make informed trading decisions.**
+
+8. **As a trainer, I want to generate unique Pokémon images using DALL-E so I can customize my collection.**
+
+9. **As a trainer, I want to participate in AI battles, so I can engage with my Pokémon in a fun way.**
+
+10. **As a trainer, I want to earn badges and achievements, so I can track my progress and accomplishments.**
+
+11. **As a trainer, I want to chat with other players, so I can negotiate trades and discuss strategies.**
+
+12. **As an administrator, I want to monitor trading activity, so I can prevent fraudulent trades.**
+
+13. **As an administrator, I want to manage user accounts, so I can ensure fair play.**
+
+14. **As an administrator, I want to oversee API integrations, so I can maintain platform performance.**
+
+15. **As a trainer, I want to be able to buy/update my collection with the newest release Pokémon.**
+
+16. **As a trainer, I want to be able to see my Pokémon's stats, so I can see which ones I want to battle with.**
+
+17. **As a trainer, I want to be able to see what I need to do to complete my achievements/earn badges.**
+
+18. **As an administrator, I want to see AI battles between players to see how everyone is doing and make changes.**
 
 ---
 

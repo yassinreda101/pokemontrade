@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Achievement Progress - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Achievement Progress</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'achievements:list' %}" class="btn btn-primary">
+            <i class="fas fa-trophy"></i> View Achievements
+        </a>
+        <a href="{% url 'achievements:badge_list' %}" class="btn btn-info">
+            <i class="fas fa-award"></i> View Badges
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3>Your Stats</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h1>{{ pokemon_count }}</h1>
+                                <p>Pokemon Collected</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h1>{{ custom_pokemon_count }}</h1>
+                                <p>Custom Pokemon Created</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h1>{{ type_count }}</h1>
+                                <p>Different Types Collected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h1>{{ trades_completed }}</h1>
+                                <p>Trades Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h1>{{ battles_won }}</h1>
+                                <p>Battles Won</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h1>{{ items_sold }}</h1>
+                                <p>Pokemon Sold</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3>Achievement Requirements</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h4>Collection Achievements</h4>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Collect 5 Pokemon
+                                {% if pokemon_count >= 5 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ pokemon_count }}/5</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Collect 10 Pokemon
+                                {% if pokemon_count >= 10 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ pokemon_count }}/10</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Collect 25 Pokemon
+                                {% if pokemon_count >= 25 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ pokemon_count }}/25</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Collect 5 different types
+                                {% if type_count >= 5 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ type_count }}/5</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Create a custom Pokemon
+                                {% if custom_pokemon_count >= 1 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ custom_pokemon_count }}/1</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-6">
+                        <h4>Trading & Battle Achievements</h4>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Complete 1 trade
+                                {% if trades_completed >= 1 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ trades_completed }}/1</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Complete 5 trades
+                                {% if trades_completed >= 5 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ trades_completed }}/5</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Win 1 battle
+                                {% if battles_won >= 1 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ battles_won }}/1</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Win 5 battles
+                                {% if battles_won >= 5 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ battles_won }}/5</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Sell 1 Pokemon
+                                {% if items_sold >= 1 %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ items_sold }}/1</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

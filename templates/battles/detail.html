@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Battle Details - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>
+            {% if battle.is_ai_opponent %}
+            Battle against AI
+            {% else %}
+            Battle: {{ battle.challenger.username }} vs {{ battle.opponent.username }}
+            {% endif %}
+        </h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <span class="badge
+            {% if battle.status == 'pending' %}
+                bg-warning
+            {% elif battle.status == 'in_progress' %}
+                bg-info
+            {% elif battle.status == 'completed' %}
+                bg-success
+            {% else %}
+                bg-secondary
+            {% endif %}
+            fs-5">
+            {{ battle.get_status_display }}
+        </span>
+    </div>
+</div>
+
+<!-- Battle Arena -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h3>Battle Arena</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Challenger Pokemon -->
+                    <div class="col-md-5 text-center">
+                        <h4>{{ battle.challenger.username }}</h4>
+                        {% if challenger_pokemon %}
+                        {% if challenger_pokemon.pokemon.is_custom %}
+                        <img src="{{ challenger_pokemon.pokemon.image_url }}" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="{{ challenger_pokemon.pokemon.name }}">
+                        <h5>{{ challenger_pokemon.pokemon.name|title }}</h5>
+                        {% else %}
+                        <img src="{{ challenger_pokemon.pokemon.species.image_url }}" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="{{ challenger_pokemon.pokemon.species.name }}">
+                        <h5>
+                            {% if challenger_pokemon.pokemon.nickname %}
+                            {{ challenger_pokemon.pokemon.nickname }}
+                            {% else %}
+                            {{ challenger_pokemon.pokemon.species.name|title }}
+                            {% endif %}
+                        </h5>
+                        {% endif %}
+                        <p>Level: {{ challenger_pokemon.pokemon.level }}</p>
+                        <p>
+                            Type:
+                            {% if challenger_pokemon.pokemon.is_custom %}
+                            <span class="badge bg-info">{{ challenger_pokemon.pokemon.type }}</span>
+                            {% else %}
+                            {% for type in challenger_pokemon.pokemon.species.types %}
+                            <span class="badge bg-info">{{ type }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </p>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ challenger_hp_percent }}%;" aria-valuenow="{{ challenger_hp_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                HP: {{ challenger_hp_percent }}%
+                            </div>
+                        </div>
+                        {% else %}
+                        <p>No Pokemon selected</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-center justify-content-center">
+                        <h1>VS</h1>
+                    </div>
+
+                    <!-- Opponent Pokemon -->
+                    <div class="col-md-5 text-center">
+                        {% if battle.is_ai_opponent %}
+                        <h4>AI Opponent</h4>
+                        {% if ai_pokemon_image %}
+                        <img src="{{ ai_pokemon_image }}" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="{{ opponent_pokemon_name }}">
+                        {% else %}
+                        <img src="https://via.placeholder.com/200?text=AI+{{ opponent_pokemon_name }}" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="AI Pokemon">
+                        {% endif %}
+                        <h5>{{ opponent_pokemon_name }}</h5>
+                        <p>Level: {% if challenger_pokemon %}{{ challenger_pokemon.pokemon.level }}{% else %}5{% endif %}</p>
+                        {% if ai_pokemon_type %}
+                        <p>Type: <span class="badge bg-info">{{ ai_pokemon_type|title }}</span></p>
+                        {% endif %}
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ ai_hp_percent }}%;" aria-valuenow="{{ ai_hp_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                HP: {{ ai_hp_percent }}%
+                            </div>
+                        </div>
+                        {% elif opponent_pokemon %}
+                        <h4>{{ battle.opponent.username }}</h4>
+                        {% if opponent_pokemon.pokemon.is_custom %}
+                        <img src="{{ opponent_pokemon.pokemon.image_url }}" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="{{ opponent_pokemon.pokemon.name }}">
+                        <h5>{{ opponent_pokemon.pokemon.name|title }}</h5>
+                        {% else %}
+                        <img src="{{ opponent_pokemon.pokemon.species.image_url }}" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="{{ opponent_pokemon.pokemon.species.name }}">
+                        <h5>
+                            {% if opponent_pokemon.pokemon.nickname %}
+                            {{ opponent_pokemon.pokemon.nickname }}
+                            {% else %}
+                            {{ opponent_pokemon.pokemon.species.name|title }}
+                            {% endif %}
+                        </h5>
+                        {% endif %}
+                        <p>Level: {{ opponent_pokemon.pokemon.level }}</p>
+                        <p>
+                            Type:
+                            {% if opponent_pokemon.pokemon.is_custom %}
+                            <span class="badge bg-info">{{ opponent_pokemon.pokemon.type }}</span>
+                            {% else %}
+                            {% for type in opponent_pokemon.pokemon.species.types %}
+                            <span class="badge bg-info">{{ type }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </p>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ opponent_pokemon.current_hp }}%;" aria-valuenow="{{ opponent_pokemon.current_hp }}" aria-valuemin="0" aria-valuemax="100">
+                                HP: {{ opponent_pokemon.current_hp }}%
+                            </div>
+                        </div>
+                        {% else %}
+                        <h4>{{ battle.opponent.username }}</h4>
+                        <p>No Pokemon selected</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if battle.status == 'pending' and user == battle.opponent and not opponent_pokemon %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3>Respond to Challenge</h3>
+            </div>
+            <div class="card-body">
+                <p class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> {{ battle.challenger.username }} has challenged you to a battle! Select one of your Pokemon to accept the challenge.
+                </p>
+
+                <form method="post" action="{% url 'battles:respond' pk=battle.id %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="pokemon">Select your Pokemon:</label>
+                        <select name="pokemon" id="pokemon" class="form-control" required>
+                            <option value="">-- Select Pokemon --</option>
+                            {% for pokemon in user.pokemons.all %}
+                            <option value="{{ pokemon.id }}">
+                                {% if pokemon.nickname %}
+                                {{ pokemon.nickname }} (Lvl {{ pokemon.level }})
+                                {% elif pokemon.is_custom %}
+                                {{ pokemon.name|title }} (Lvl {{ pokemon.level }})
+                                {% else %}
+                                {{ pokemon.species.name|title }} (Lvl {{ pokemon.level }})
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Accept Challenge</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Battle Log -->
+{% if battle_log %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>Battle Log</h3>
+            </div>
+            <div class="card-body">
+                <div class="battle-log p-3 bg-light rounded">
+                    {% if battle.status == 'completed' %}
+                    <h4 class="text-center mb-4">
+                        {% if battle_result == 'Victory' %}
+                        <span class="text-success">You won the battle!</span>
+                        {% elif battle_result == 'Defeat' %}
+                        <span class="text-danger">You lost the battle!</span>
+                        {% else %}
+                        <span class="text-secondary">The battle ended in a draw!</span>
+                        {% endif %}
+                    </h4>
+
+                    {% if battle_log.turns %}
+                    {% for turn in battle_log.turns %}
+                    <div class="mb-3">
+                        <h5>Turn {{ turn.turn }}:</h5>
+                        <p>{{ turn.action }}</p>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if battle_log.summary %}
+                    <div class="alert alert-info">
+                        <strong>Summary:</strong> {{ battle_log.summary }}
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-center">Battle has not been completed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Actions -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'battles:list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Battles
+                    </a>
+
+                    {% if battle.status == 'completed' %}
+                    <a href="{% url 'battles:create_ai' %}" class="btn btn-success">
+                        <i class="fas fa-robot"></i> Start New AI Battle
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

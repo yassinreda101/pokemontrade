@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat: {{ room.name }} - Pokemon Trading App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f8f9fa;
+    }
+    .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .message-sent {
+        background-color: #d1ecf1;
+        margin-left: 20%;
+        border-top-right-radius: 2px;
+    }
+    .message-received {
+        background-color: #f8f9fa;
+        margin-right: 20%;
+        border-top-left-radius: 2px;
+        border: 1px solid #dee2e6;
+    }
+    .message-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+    .chat-input {
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.375rem 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>Chat: {{ room.name }}</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'chat:room_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Rooms
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>Messages</h3>
+            </div>
+            <div class="card-body">
+                <div class="chat-container" id="chat-messages">
+                    {% for message in messages %}
+                    <div class="message {% if message.sender == user %}message-sent{% else %}message-received{% endif %}">
+                        <div class="message-info">
+                            <span><strong>{{ message.sender.username }}</strong></span>
+                            <span>{{ message.timestamp|date:"M d, Y, g:i a" }}</span>
+                        </div>
+                        <p class="mb-0">{{ message.content }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-muted">No messages yet. Be the first to say something!</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-3">
+                    <form id="chat-form">
+                        <div class="input-group">
+                            <input type="text" id="chat-message-input" class="form-control chat-input" placeholder="Type your message...">
+                            <button class="btn btn-primary" type="submit" id="chat-message-submit">Send</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3>Participants</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for participant in room.participants.all %}
+                    <li class="list-group-item {% if participant == user %}active{% endif %}">
+                        {{ participant.username }}
+                        {% if participant == user %}
+                        <span class="badge bg-primary float-end">You</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const roomName = "{{ room.name }}";
+    const username = "{{ user.username }}";
+
+    // Set up WebSocket connection
+    // Use wss:// for HTTPS connections and ws:// for HTTP connections
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const wsUrl = protocol + window.location.host + '/ws/chat/' + roomName + '/';
+
+    console.log('Attempting to connect to WebSocket URL:', wsUrl);
+
+    const chatSocket = new WebSocket(wsUrl);
+
+    // Handle WebSocket connection open
+    chatSocket.onopen = function(e) {
+        console.log('WebSocket connection established');
+        // Add a success message to the chat
+        const chatMessages = document.querySelector('#chat-messages');
+        const connectionElement = document.createElement('div');
+        connectionElement.className = 'alert alert-success';
+        connectionElement.textContent = 'Connected to chat room!';
+        chatMessages.appendChild(connectionElement);
+
+        // Scroll to bottom after connection message
+        scrollToBottom();
+    };
+
+    // Handle WebSocket errors
+    chatSocket.onerror = function(e) {
+        console.error('WebSocket error:', e);
+        const chatMessages = document.querySelector('#chat-messages');
+        const errorElement = document.createElement('div');
+        errorElement.className = 'alert alert-danger';
+        errorElement.textContent = 'WebSocket connection error. Messages may not be sent or received. Try refreshing the page.';
+        chatMessages.appendChild(errorElement);
+
+        // Scroll to bottom to show error
+        scrollToBottom();
+    };
+
+    // Handle incoming messages
+    chatSocket.onmessage = function(e) {
+        console.log('Message received:', e.data);
+        const data = JSON.parse(e.data);
+        displayMessage(data.message, data.username, data.timestamp);
+    };
+
+    // Handle WebSocket connection close
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly. Code:', e.code, 'Reason:', e.reason);
+
+        // Show reconnection message after unexpected close
+        setTimeout(function() {
+            const chatMessages = document.querySelector('#chat-messages');
+            const reconnectElement = document.createElement('div');
+            reconnectElement.className = 'alert alert-warning';
+            reconnectElement.textContent = 'Connection lost. Refresh the page to reconnect.';
+            chatMessages.appendChild(reconnectElement);
+
+            // Scroll to bottom to show reconnect message
+            scrollToBottom();
+        }, 1000);
+    };
+
+    // Display a message in the chat container
+    function displayMessage(message, messageUsername, timestamp) {
+        const chatMessages = document.querySelector('#chat-messages');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message ' + (messageUsername === username ? 'message-sent' : 'message-received');
+
+        const messageInfo = document.createElement('div');
+        messageInfo.className = 'message-info';
+
+        const usernameSpan = document.createElement('span');
+        usernameSpan.innerHTML = '<strong>' + messageUsername + '</strong>';
+
+        const timestampSpan = document.createElement('span');
+        const date = new Date(timestamp);
+        timestampSpan.textContent = date.toLocaleString();
+
+        messageInfo.appendChild(usernameSpan);
+        messageInfo.appendChild(timestampSpan);
+
+        const messageContent = document.createElement('p');
+        messageContent.className = 'mb-0';
+        messageContent.textContent = message;
+
+        messageElement.appendChild(messageInfo);
+        messageElement.appendChild(messageContent);
+
+        chatMessages.appendChild(messageElement);
+
+        // Scroll to bottom
+        scrollToBottom();
+    }
+
+    // Scroll the chat container to the bottom
+    function scrollToBottom() {
+        const chatMessages = document.querySelector('#chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Focus the message input when the page loads
+    document.querySelector('#chat-message-input').focus();
+
+    // Handle Enter key press in the message input
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.key === 'Enter') {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    // Handle form submission
+    document.querySelector('#chat-form').onsubmit = function(e) {
+        e.preventDefault();
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value.trim();
+
+        if (message === '') {
+            return;
+        }
+
+        // Send message to WebSocket
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'username': username
+        }));
+
+        // Clear input field
+        messageInputDom.value = '';
+        messageInputDom.focus();
+    };
+
+    // Scroll to bottom on load
+    window.onload = function() {
+        scrollToBottom();
+    };
+</script>
+{% endblock %}

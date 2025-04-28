@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Achievements - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Achievements</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'achievements:badge_list' %}" class="btn btn-primary">
+            <i class="fas fa-award"></i> View Badges
+        </a>
+        <a href="{% url 'achievements:progress' %}" class="btn btn-info">
+            <i class="fas fa-chart-line"></i> View Progress
+        </a>
+    </div>
+</div>
+
+<!-- Achievement Progress -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Achievement Progress: {{ earned_achievements }} / {{ total_achievements }}</h4>
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ completion_percentage }}%;" aria-valuenow="{{ completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                        {{ completion_percentage }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Achievement Categories -->
+{% for category, achievements in achievement_categories.items %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>{{ category|title }} Achievements</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for achievement in achievements %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 {% if achievement.is_earned %}border-success{% endif %}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h4>{{ achievement.name }}</h4>
+                                    {% if achievement.is_earned %}
+                                    <span class="badge bg-success">Earned</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Locked</span>
+                                    {% endif %}
+                                </div>
+                                <p class="card-text">{{ achievement.description }}</p>
+                                <p class="card-text">
+                                    <strong>Rewards:</strong>
+                                    {{ achievement.experience_reward }} XP
+                                    {% if achievement.currency_reward > 0 %}
+                                    + {{ achievement.currency_reward }} coins
+                                    {% endif %}
+                                </p>
+                                {% if achievement.is_earned %}
+                                <p class="card-text text-success">
+                                    <i class="fas fa-check-circle"></i> You've unlocked this achievement!
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

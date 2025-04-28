@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Marketplace - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Marketplace</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'marketplace:create' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> List a Pokemon
+        </a>
+    </div>
+</div>
+
+<!-- Filter form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" name="query" class="form-control" placeholder="Search..." value="{{ query }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Min Price</label>
+                <input type="number" name="min_price" class="form-control" min="0" value="{{ min_price }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Max Price</label>
+                <input type="number" name="max_price" class="form-control" min="0" value="{{ max_price }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Type</label>
+                <select name="type" class="form-control">
+                    <option value="">All Types</option>
+                    {% for type_value, type_name in all_types %}
+                    <option value="{{ type_value }}" {% if type_filter == type_value %}selected{% endif %}>{{ type_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Marketplace listings -->
+<div class="row mb-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>Available Pokemon</h3>
+            </div>
+            <div class="card-body">
+                {% if listings %}
+                <div class="row">
+                    {% for listing in listings %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100">
+                            {% if listing.pokemon.is_custom %}
+                            <img src="{{ listing.pokemon.image_url }}" class="card-img-top" alt="{{ listing.pokemon.name }}">
+                            {% else %}
+                            <img src="{{ listing.pokemon.species.image_url }}" class="card-img-top" alt="{{ listing.pokemon.species.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if listing.pokemon.nickname %}
+                                    {{ listing.pokemon.nickname }}
+                                    {% elif listing.pokemon.is_custom %}
+                                    {{ listing.pokemon.name|title }}
+                                    {% else %}
+                                    {{ listing.pokemon.species.name|title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">
+                                    <span class="badge bg-primary">Level {{ listing.pokemon.level }}</span>
+                                    <span class="badge bg-secondary">{{ listing.pokemon.get_rarity_display }}</span>
+                                </p>
+                                <p class="card-text">
+                                    <strong>Price:</strong> {{ listing.price }} coins
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">Seller: {{ listing.seller.username }}</small>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'marketplace:detail' pk=listing.id %}" class="btn btn-sm btn-primary w-100">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center">No listings available at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My listings -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3>My Listings</h3>
+            </div>
+            <div class="card-body">
+                {% if my_listings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Pokemon</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Listed On</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for listing in my_listings %}
+                        <tr>
+                            <td>
+                                {% if listing.pokemon.nickname %}
+                                {{ listing.pokemon.nickname }}
+                                {% elif listing.pokemon.is_custom %}
+                                {{ listing.pokemon.name|title }}
+                                {% else %}
+                                {{ listing.pokemon.species.name|title }}
+                                {% endif %}
+                            </td>
+                            <td>{{ listing.price }} coins</td>
+                            <td>
+                                {% if listing.status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                                {% elif listing.status == 'sold' %}
+                                <span class="badge bg-info">Sold</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ listing.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'marketplace:detail' pk=listing.id %}" class="btn btn-sm btn-primary">View</a>
+                                {% if listing.status == 'active' %}
+                                <a href="{% url 'marketplace:cancel' pk=listing.id %}" class="btn btn-sm btn-danger">Cancel</a>
+                                {% elif listing.status != 'active' %}
+                                <a href="{% url 'marketplace:delete' pk=listing.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">You don't have any listings yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

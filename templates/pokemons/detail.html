@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if pokemon.nickname %}
+{{ pokemon.nickname }} - Pokemon Trading App
+{% elif pokemon.is_custom %}
+{{ pokemon.name|title }} - Pokemon Trading App
+{% else %}
+{{ pokemon.species.name|title }} - Pokemon Trading App
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            {% if pokemon.is_custom %}
+            <img src="{{ pokemon.image_url }}" class="card-img-top" alt="{{ pokemon.name }}">
+            {% else %}
+            <img src="{{ pokemon.species.image_url }}" class="card-img-top" alt="{{ pokemon.species.name }}">
+            {% endif %}
+            <div class="card-body text-center">
+                <h2>
+                    {% if pokemon.nickname %}
+                    {{ pokemon.nickname }} ({{ pokemon.species.name|title }})
+                    {% elif pokemon.is_custom %}
+                    {{ pokemon.name|title }}
+                    {% else %}
+                    {{ pokemon.species.name|title }}
+                    {% endif %}
+                </h2>
+                <p>
+                    <span class="badge bg-primary">Level {{ pokemon.level }}</span>
+                    <span class="badge bg-secondary">{{ pokemon.get_rarity_display }}</span>
+                    {% if pokemon.is_custom %}
+                    <span class="badge bg-info">{{ pokemon.type }}</span>
+                    {% else %}
+                    {% for type in pokemon.species.types %}
+                    <span class="badge bg-info">{{ type }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </p>
+                <p>Experience: {{ pokemon.experience }} XP</p>
+                <p>Acquired: {{ pokemon.acquired_date|date:"F j, Y" }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <!-- Comment these out for now until implemented -->
+                    <a href="{% url 'marketplace:create' %}?pokemon={{ pokemon.id }}" class="btn btn-success">
+                        <i class="fas fa-tag"></i> List in Marketplace
+                    </a>
+                    <a href="{% url 'trades:create' %}?pokemon={{ pokemon.id }}" class="btn btn-info">
+                        <i class="fas fa-exchange-alt"></i> Offer Trade
+                    </a>
+                    <a href="{% url 'battles:create_ai' %}?pokemon={{ pokemon.id }}" class="btn btn-danger">
+                        <i class="fas fa-gamepad"></i> Battle with AI
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if pokemon.is_custom %}
+                    <!-- Random stats for custom Pokemon -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">HP</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Attack</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Defense</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">70</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Speed</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    {% for stat_name, stat_value in pokemon.species.stats.items %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ stat_name|title }}</label>
+                        <div class="progress">
+                            <div
+                                    class="progress-bar"
+                                    role="progressbar"
+                                    style="width: {{ stat_value }}%;"
+                                    aria-valuenow="{{ stat_value }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
+                                {{ stat_value }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Battle History</h5>
+            </div>
+            <div class="card-body">
+                <p>No battle history to display yet.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

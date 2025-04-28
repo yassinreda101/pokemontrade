@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Trade Recommendations - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>AI Trade Recommendations</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'trades:list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Trades
+        </a>
+    </div>
+</div>
+
+<!-- AI Explanation -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>AI Analysis</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-robot me-2"></i> {{ recommendations.explanation }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recommendation Categories -->
+{% if recommendations.missing_types %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3>Missing Types in Your Collection</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for item in recommendations.missing_types %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            {% if item.pokemon.is_custom %}
+                            <img src="{{ item.pokemon.image_url }}" class="card-img-top" alt="{{ item.pokemon.name }}">
+                            {% else %}
+                            <img src="{{ item.pokemon.species.image_url }}" class="card-img-top" alt="{{ item.pokemon.species.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if item.pokemon.nickname %}
+                                    {{ item.pokemon.nickname }}
+                                    {% elif item.pokemon.is_custom %}
+                                    {{ item.pokemon.name|title }}
+                                    {% else %}
+                                    {{ item.pokemon.species.name|title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">
+                                    <span class="badge bg-primary">Level {{ item.pokemon.level }}</span>
+                                    <span class="badge bg-secondary">{{ item.pokemon.get_rarity_display }}</span>
+                                </p>
+                                <p class="card-text">
+                                    Trainer: {{ item.pokemon.trainer.username }}
+                                </p>
+                                <p class="card-text">
+                                    <strong>Why:</strong> {{ item.reason }}
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'trades:create' %}?recipient={{ item.pokemon.trainer.id }}" class="btn btn-sm btn-primary w-100">
+                                    <i class="fas fa-exchange-alt"></i> Propose Trade
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if recommendations.rare_pokemon %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h3>Rare Pokemon to Consider</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for item in recommendations.rare_pokemon %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            {% if item.pokemon.is_custom %}
+                            <img src="{{ item.pokemon.image_url }}" class="card-img-top" alt="{{ item.pokemon.name }}">
+                            {% else %}
+                            <img src="{{ item.pokemon.species.image_url }}" class="card-img-top" alt="{{ item.pokemon.species.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if item.pokemon.nickname %}
+                                    {{ item.pokemon.nickname }}
+                                    {% elif item.pokemon.is_custom %}
+                                    {{ item.pokemon.name|title }}
+                                    {% else %}
+                                    {{ item.pokemon.species.name|title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">
+                                    <span class="badge bg-primary">Level {{ item.pokemon.level }}</span>
+                                    <span class="badge bg-secondary">{{ item.pokemon.get_rarity_display }}</span>
+                                </p>
+                                <p class="card-text">
+                                    Trainer: {{ item.pokemon.trainer.username }}
+                                </p>
+                                <p class="card-text">
+                                    <strong>Why:</strong> {{ item.reason }}
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'trades:create' %}?recipient={{ item.pokemon.trainer.id }}" class="btn btn-sm btn-primary w-100">
+                                    <i class="fas fa-exchange-alt"></i> Propose Trade
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if recommendations.complementary_pokemon %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3>Pokemon That Complement Your Collection</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for item in recommendations.complementary_pokemon %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            {% if item.pokemon.is_custom %}
+                            <img src="{{ item.pokemon.image_url }}" class="card-img-top" alt="{{ item.pokemon.name }}">
+                            {% else %}
+                            <img src="{{ item.pokemon.species.image_url }}" class="card-img-top" alt="{{ item.pokemon.species.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if item.pokemon.nickname %}
+                                    {{ item.pokemon.nickname }}
+                                    {% elif item.pokemon.is_custom %}
+                                    {{ item.pokemon.name|title }}
+                                    {% else %}
+                                    {{ item.pokemon.species.name|title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">
+                                    <span class="badge bg-primary">Level {{ item.pokemon.level }}</span>
+                                    <span class="badge bg-secondary">{{ item.pokemon.get_rarity_display }}</span>
+                                </p>
+                                <p class="card-text">
+                                    Trainer: {{ item.pokemon.trainer.username }}
+                                </p>
+                                <p class="card-text">
+                                    <strong>Why:</strong> {{ item.reason }}
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'trades:create' %}?recipient={{ item.pokemon.trainer.id }}" class="btn btn-sm btn-primary w-100">
+                                    <i class="fas fa-exchange-alt"></i> Propose Trade
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if recommendations.popular_pokemon %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h3>Popular Pokemon Among Trainers</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for item in recommendations.popular_pokemon %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            {% if item.pokemon.is_custom %}
+                            <img src="{{ item.pokemon.image_url }}" class="card-img-top" alt="{{ item.pokemon.name }}">
+                            {% else %}
+                            <img src="{{ item.pokemon.species.image_url }}" class="card-img-top" alt="{{ item.pokemon.species.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if item.pokemon.nickname %}
+                                    {{ item.pokemon.nickname }}
+                                    {% elif item.pokemon.is_custom %}
+                                    {{ item.pokemon.name|title }}
+                                    {% else %}
+                                    {{ item.pokemon.species.name|title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">
+                                    <span class="badge bg-primary">Level {{ item.pokemon.level }}</span>
+                                    <span class="badge bg-secondary">{{ item.pokemon.get_rarity_display }}</span>
+                                </p>
+                                <p class="card-text">
+                                    Trainer: {{ item.pokemon.trainer.username }}
+                                </p>
+                                <p class="card-text">
+                                    <strong>Why:</strong> {{ item.reason }}
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'trades:create' %}?recipient={{ item.pokemon.trainer.id }}" class="btn btn-sm btn-primary w-100">
+                                    <i class="fas fa-exchange-alt"></i> Propose Trade
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

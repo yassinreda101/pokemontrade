@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Marketplace:
+{% if listing.pokemon.nickname %}
+{{ listing.pokemon.nickname }}
+{% elif listing.pokemon.is_custom %}
+{{ listing.pokemon.name|title }}
+{% else %}
+{{ listing.pokemon.species.name|title }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>
+                    {% if listing.pokemon.nickname %}
+                    {{ listing.pokemon.nickname }}
+                    {% elif listing.pokemon.is_custom %}
+                    {{ listing.pokemon.name|title }}
+                    {% else %}
+                    {{ listing.pokemon.species.name|title }}
+                    {% endif %}
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if listing.pokemon.is_custom %}
+                        <img src="{{ listing.pokemon.image_url }}" class="img-fluid rounded" alt="{{ listing.pokemon.name }}">
+                        {% else %}
+                        <img src="{{ listing.pokemon.species.image_url }}" class="img-fluid rounded" alt="{{ listing.pokemon.species.name }}">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Details</h4>
+                        <p><strong>Level:</strong> {{ listing.pokemon.level }}</p>
+                        <p><strong>Rarity:</strong> {{ listing.pokemon.get_rarity_display }}</p>
+                        <p>
+                            <strong>Type:</strong>
+                            {% if listing.pokemon.is_custom %}
+                            <span class="badge bg-info">{{ listing.pokemon.type }}</span>
+                            {% else %}
+                            {% for type in listing.pokemon.species.types %}
+                            <span class="badge bg-info">{{ type }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p><strong>Seller:</strong> {{ listing.seller.username }}</p>
+                        <p><strong>Listed:</strong> {{ listing.created_at|date:"F j, Y, g:i a" }}</p>
+                        <p><strong>Status:</strong>
+                            {% if listing.status == 'active' %}
+                            <span class="badge bg-success">Active</span>
+                            {% elif listing.status == 'sold' %}
+                            <span class="badge bg-info">Sold</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Cancelled</span>
+                            {% endif %}
+                        </p>
+                        {% if listing.description %}
+                        <h4>Description</h4>
+                        <p>{{ listing.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Stats</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if listing.pokemon.is_custom %}
+                    <!-- Random stats for custom Pokemon -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">HP</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Attack</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Defense</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">70</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Speed</label>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    {% for stat_name, stat_value in listing.pokemon.species.stats.items %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ stat_name|title }}</label>
+                        <div class="progress">
+                            <div
+                                    class="progress-bar"
+                                    role="progressbar"
+                                    style="width: {{ stat_value }}%;"
+                                    aria-valuenow="{{ stat_value }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
+                                {{ stat_value }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h3>Price: {{ listing.price }} coins</h3>
+            </div>
+            <div class="card-body">
+                {% if can_purchase %}
+                <p>Your balance: {{ user.currency }} coins</p>
+                {% if user.currency < listing.price %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> You don't have enough coins to purchase this Pokemon!
+                </div>
+                {% else %}
+                <form method="post" action="{% url 'marketplace:purchase' pk=listing.pk %}">
+                    {% csrf_token %}
+                    {{ purchase_form }}
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-shopping-cart"></i> Purchase
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+                {% elif can_cancel %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> This is your listing.
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'marketplace:cancel' pk=listing.pk %}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-times"></i> Cancel Listing
+                    </a>
+                </div>
+                {% elif listing.status == 'sold' %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> This Pokemon has already been sold.
+                </div>
+                {% else %}
+                <div class="alert alert-secondary">
+                    <i class="fas fa-info-circle"></i> This listing is no longer active.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Actions</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'marketplace:list' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Marketplace
+                    </a>
+                    {% if user == listing.seller %}
+                    <a href="{% url 'pokemons:detail' pk=listing.pokemon.id %}" class="btn btn-info">
+                        <i class="fas fa-eye"></i> View Pokemon Details
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

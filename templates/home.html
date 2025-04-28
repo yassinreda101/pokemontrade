@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}Pokemon Trading App - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="bg-primary text-white p-5 rounded mb-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="display-4">Welcome to Pokemon Trading App</h1>
+            <p class="lead">Collect, trade, and battle with your favorite Pokemon!</p>
+            {% if not user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg me-2">Sign Up</a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">Login</a>
+            </div>
+            {% else %}
+            <div class="mt-4">
+                <a href="{% url 'pokemons:list' %}" class="btn btn-light btn-lg me-2">My Pokemon</a>
+                <a href="{% url 'pokemons:create_custom' %}" class="btn btn-outline-light btn-lg">Create Custom Pokemon</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-center">
+            <i class="fas fa-dragon fa-8x"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Total Trainers</h5>
+                <p class="card-text display-6">{{ total_trainers }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-dragon fa-3x text-danger mb-3"></i>
+                <h5 class="card-title">Total Pokemon</h5>
+                <p class="card-text display-6">{{ total_pokemon }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-gamepad fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Upcoming Features</h5>
+                <p class="card-text">Marketplace, Trading, Battles</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>Features</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="fas fa-exchange-alt fa-3x text-primary mb-3"></i>
+                        <h4>Trade Pokemon</h4>
+                        <p>Exchange Pokemon with other trainers to complete your collection.</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="fas fa-gamepad fa-3x text-danger mb-3"></i>
+                        <h4>Battle</h4>
+                        <p>Test your Pokemon's strength in AI battles.</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="fas fa-palette fa-3x text-success mb-3"></i>
+                        <h4>Create Custom Pokemon</h4>
+                        <p>Design your own Pokemon with AI-generated images.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Pokemon -->
+{% if recent_pokemon %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3>Recent Pokemon</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for pokemon in recent_pokemon %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            {% if pokemon.is_custom %}
+                            <img src="{{ pokemon.image_url }}" class="card-img-top" alt="{{ pokemon.name }}">
+                            {% else %}
+                            <img src="{{ pokemon.species.image_url }}" class="card-img-top" alt="{{ pokemon.species.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if pokemon.nickname %}
+                                    {{ pokemon.nickname }}
+                                    {% elif pokemon.is_custom %}
+                                    {{ pokemon.name|title }}
+                                    {% else %}
+                                    {{ pokemon.species.name|title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">
+                                    <span class="badge bg-primary">Level {{ pokemon.level }}</span>
+                                    <span class="badge bg-secondary">{{ pokemon.get_rarity_display }}</span>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">Trainer: {{ pokemon.trainer.username }}</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- After the Recent Pokemon section, add: -->
+
+<!-- Recent Marketplace Listings -->
+{% if recent_listings %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Recent Marketplace Listings</h3>
+                <a href="{% url 'marketplace:list' %}" class="btn btn-light btn-sm">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for listing in recent_listings %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            {% if listing.pokemon.is_custom %}
+                            <img src="{{ listing.pokemon.image_url }}" class="card-img-top" alt="{{ listing.pokemon.name }}">
+                            {% else %}
+                            <img src="{{ listing.pokemon.species.image_url }}" class="card-img-top" alt="{{ listing.pokemon.species.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if listing.pokemon.nickname %}
+                                    {{ listing.pokemon.nickname }}
+                                    {% elif listing.pokemon.is_custom %}
+                                    {{ listing.pokemon.name|title }}
+                                    {% else %}
+                                    {{ listing.pokemon.species.name|title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">
+                                    <strong>Price:</strong> {{ listing.price }} coins
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">Seller: {{ listing.seller.username }}</small>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'marketplace:detail' pk=listing.id %}" class="btn btn-sm btn-primary w-100">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Trades -->
+{% if recent_trades %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Recent Trades</h3>
+                <a href="{% url 'trades:list' %}" class="btn btn-light btn-sm">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Trainers</th>
+                            <th>Date</th>
+                            <th>Details</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for trade in recent_trades %}
+                        <tr>
+                            <td>{{ trade.proposer.username }} ↔️ {{ trade.recipient.username }}</td>
+                            <td>{{ trade.updated_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'trades:detail' pk=trade.id %}" class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Top Trainers -->
+{% if top_trainers %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3>Top Trainers</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Trainer</th>
+                        <th>Level</th>
+                        <th>Experience</th>
+                        <th>Pokemon Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for trainer in top_trainers %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ trainer.username }}</td>
+                        <td>{{ trainer.level }}</td>
+                        <td>{{ trainer.experience_points }} XP</td>
+                        <td>{{ trainer.pokemon_count }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

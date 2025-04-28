@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Badges - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Badges</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'achievements:list' %}" class="btn btn-primary">
+            <i class="fas fa-trophy"></i> View Achievements
+        </a>
+        <a href="{% url 'achievements:progress' %}" class="btn btn-info">
+            <i class="fas fa-chart-line"></i> View Progress
+        </a>
+    </div>
+</div>
+
+<!-- Badge Progress -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Badge Progress: {{ earned_badges }} / {{ total_badges }}</h4>
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ completion_percentage }}%;" aria-valuenow="{{ completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                        {{ completion_percentage }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Badges -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>Trainer Badges</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for badge in badges %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 {% if badge.is_earned %}border-success{% endif %}">
+                            <div class="card-header {% if badge.is_earned %}bg-success text-white{% endif %}">
+                                <h4>{{ badge.name }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ badge.description }}</p>
+                                <p class="card-text">
+                                    <strong>Difficulty:</strong>
+                                    {% for i in "12345678910" %}
+                                    {% if forloop.counter <= badge.difficulty %}
+                                    <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <p class="card-text">
+                                    <strong>Reward:</strong> {{ badge.experience_reward }} XP
+                                </p>
+                                {% if badge.is_earned %}
+                                <p class="card-text text-success">
+                                    <i class="fas fa-check-circle"></i> You've earned this badge!
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

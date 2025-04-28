@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" class="profile-picture mb-3">
+                {% else %}
+                <img src="https://via.placeholder.com/150" alt="{{ user.username }}" class="profile-picture mb-3">
+                {% endif %}
+                <h3>{{ user.username }}</h3>
+                <p>Level: {{ user.level }}</p>
+                <p>Experience: {{ user.experience_points }} XP</p>
+                <p>Coins: {{ user.currency }}</p>
+                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>My Details</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Location:</strong> {{ user.location|default:"Not specified" }}</p>
+                <p><strong>Favorite Type:</strong> {{ user.favorite_type|default:"Not specified" }}</p>
+                <p><strong>Bio:</strong> {{ user.bio|default:"No bio provided" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>My Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <h3>{{ user.pokemons.count }}</h3>
+                        <p>Pokemon</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h3>{{ user.battles_won.count }}</h3>
+                        <p>Battles Won</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h3>{{ user.achievements.count }}</h3>
+                        <p>Achievements</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <p>No recent activity to display.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5>Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p>Once you delete your account, there is no going back. Please be certain.</p>
+                <a href="{% url 'accounts:delete_account' %}" class="btn btn-danger">
+                    <i class="fas fa-user-times"></i> Delete My Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-picture {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #ccc; /* Optional: nice light border */
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+{% endblock %}

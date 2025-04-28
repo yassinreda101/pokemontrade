@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Battles - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Battles</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'battles:create_ai' %}" class="btn btn-success me-2">
+            <i class="fas fa-robot"></i> Battle AI
+        </a>
+        <a href="{% url 'battles:create_player' %}" class="btn btn-danger">
+            <i class="fas fa-gamepad"></i> Challenge Player
+        </a>
+    </div>
+</div>
+
+<!-- Battles as Challenger -->
+<div class="row mb-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>Your Battle Challenges</h3>
+            </div>
+            <div class="card-body">
+                {% if battles_as_challenger %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Opponent</th>
+                            <th>Status</th>
+                            <th>Result</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for battle in battles_as_challenger %}
+                        <tr>
+                            <td>
+                                {% if battle.is_ai_opponent %}
+                                <span class="badge bg-warning">AI Opponent</span>
+                                {% else %}
+                                {{ battle.opponent.username }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if battle.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif battle.status == 'in_progress' %}
+                                <span class="badge bg-info">In Progress</span>
+                                {% elif battle.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if battle.result_display == 'Victory' %}
+                                <span class="text-success">Victory</span>
+                                {% elif battle.result_display == 'Defeat' %}
+                                <span class="text-danger">Defeat</span>
+                                {% elif battle.result_display == 'Draw' %}
+                                <span class="text-warning">Draw</span>
+                                {% else %}
+                                <span>{{ battle.result_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ battle.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'battles:detail' pk=battle.id %}" class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">You haven't initiated any battles yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Battles as Opponent -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h3>Battle Challenges Received</h3>
+            </div>
+            <div class="card-body">
+                {% if battles_as_opponent %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Challenger</th>
+                            <th>Status</th>
+                            <th>Result</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for battle in battles_as_opponent %}
+                        <tr>
+                            <td>{{ battle.challenger.username }}</td>
+                            <td>
+                                {% if battle.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif battle.status == 'in_progress' %}
+                                <span class="badge bg-info">In Progress</span>
+                                {% elif battle.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if battle.result_display == 'Victory' %}
+                                <span class="text-success">Victory</span>
+                                {% elif battle.result_display == 'Defeat' %}
+                                <span class="text-danger">Defeat</span>
+                                {% elif battle.result_display == 'Draw' %}
+                                <span class="text-warning">Draw</span>
+                                {% else %}
+                                <span>{{ battle.result_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ battle.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'battles:detail' pk=battle.id %}" class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">You haven't received any battle challenges yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

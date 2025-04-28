@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Pokemon - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<h2>Search Pokemon</h2>
+
+<!-- Search Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-10">
+                <input type="text" name="query" class="form-control" placeholder="Search Pokemon..." value="{{ query }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if query %}
+<!-- Search Results -->
+{% if results %}
+<div class="row">
+    {% for species in results %}
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <img src="{{ species.image_url }}" class="card-img-top" alt="{{ species.name }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ species.name|title }}</h5>
+                <p class="card-text">
+                    {% for type in species.types %}
+                    <span class="badge bg-info">{{ type }}</span>
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    No results found for "{{ query }}".
+</div>
+{% endif %}
+{% else %}
+<!-- Popular Pokemon -->
+<div class="row">
+    {% for species in popular_pokemon %}
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <img src="{{ species.image_url }}" class="card-img-top" alt="{{ species.name }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ species.name|title }}</h5>
+                <p class="card-text">
+                    {% for type in species.types %}
+                    <span class="badge bg-info">{{ type }}</span>
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

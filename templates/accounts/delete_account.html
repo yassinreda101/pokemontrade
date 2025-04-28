@@ -1,0 +1,38 @@
+<!-- accounts/delete_account.html -->
+{% extends 'base.html' %}
+
+{% block title %}Delete Account - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h2 class="text-center">Delete Account</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <p><i class="fas fa-exclamation-triangle"></i> <strong>Warning!</strong> This action cannot be undone.</p>
+                    <p>Deleting your account will permanently remove:</p>
+                    <ul>
+                        <li>Your profile information</li>
+                        <li>All your Pokémon</li>
+                        <li>Your marketplace listings</li>
+                        <li>Your trade history</li>
+                        <li>Your battle history</li>
+                        <li>All achievements and badges</li>
+                    </ul>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">Delete My Account Permanently</button>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

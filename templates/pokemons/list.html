@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}My Pokemon - Pokemon Trading App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>My Pokemon</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'pokemons:create_custom' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create Custom Pokemon
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="{{ form.query.id_for_label }}" class="form-label">{{ form.query.label }}</label>
+                {{ form.query }}
+            </div>
+            <div class="col-md-3">
+                <label for="{{ form.type_filter.id_for_label }}" class="form-label">{{ form.type_filter.label }}</label>
+                {{ form.type_filter }}
+            </div>
+            <div class="col-md-3">
+                <label for="{{ form.rarity_filter.id_for_label }}" class="form-label">{{ form.rarity_filter.label }}</label>
+                {{ form.rarity_filter }}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if pokemons %}
+<div class="row">
+    {% for pokemon in pokemons %}
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            {% if pokemon.is_custom %}
+            <img src="{{ pokemon.image_url }}" class="card-img-top" alt="{{ pokemon.name }}">
+            {% else %}
+            <img src="{{ pokemon.species.image_url }}" class="card-img-top" alt="{{ pokemon.species.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">
+                    {% if pokemon.nickname %}
+                    {{ pokemon.nickname }} ({{ pokemon.species.name|title }})
+                    {% elif pokemon.is_custom %}
+                    {{ pokemon.name|title }}
+                    {% else %}
+                    {{ pokemon.species.name|title }}
+                    {% endif %}
+                </h5>
+                <p class="card-text">
+                    <span class="badge bg-primary">Level {{ pokemon.level }}</span>
+                    <span class="badge bg-secondary">{{ pokemon.get_rarity_display }}</span>
+                </p>
+                <p class="card-text">
+                    {% if pokemon.is_custom %}
+                    <span class="badge bg-info">{{ pokemon.type }}</span>
+                    {% else %}
+                    {% for type in pokemon.species.types %}
+                    <span class="badge bg-info">{{ type }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'pokemons:detail' pk=pokemon.id %}" class="btn btn-sm btn-primary">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    You don't have any Pokémon yet. You'll receive starter Pokémon upon registration.
+</div>
+{% endif %}
+{% endblock %}
